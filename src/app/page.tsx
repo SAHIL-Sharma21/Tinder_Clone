@@ -1,5 +1,8 @@
 import {getKindeServerSession} from '@kinde-oss/kinde-auth-nextjs/server'
 import { redirect } from 'next/navigation';
+import { getUserByID, getUserWithNoConnection } from './neo4j.action';
+import HomePage from './components/Home';
+
 
 
 export default async function Home() {
@@ -19,9 +22,16 @@ export default async function Home() {
     return redirect('/api/auth/login?post_login_redirect_url=http://localhost:3000/callback');
   }
 
+  const userWithNotConnection = await getUserWithNoConnection(user.id);
+  const currentUser = await getUserByID(user.id);
+
   return (
     <main>
-      Hi, {user.given_name}
+      {currentUser && (
+      <HomePage currentUser={currentUser} users={userWithNotConnection} />
+      )}
+    
+
     </main>
   );
 }
